@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import {launchCamera} from 'react-native-image-picker';
-import GetLocation from 'react-native-get-location';
+import Geolocation from 'react-native-geolocation-service';
 
 const Selfie = ({navigation}) => {
   const [picture, setpicture] = useState(
@@ -32,7 +32,7 @@ const Selfie = ({navigation}) => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         const result = await launchCamera({
           mediaType: 'photo',
-          cameraType: 'font',
+          cameraType: 'front',
         });
         setpicture(result?.assets[0]?.uri);
         settoggle(false);
@@ -68,28 +68,28 @@ const Selfie = ({navigation}) => {
     }
   };
 
-  const getCurrentLocation = async () => {
-    await GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 60000,
-    })
-      .then(location => {
-        if (location) {
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        if (position) {
           navigation.navigate('Maps', {
-            latitude: location.latitude,
-            longitude: location.longitude,
-            picture
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            picture,
           });
         }
-      })
-      .catch(error => {
+      },
+      error => {
         const {code, message} = error;
         console.warn(code, message);
-      });
+      },
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    );
   };
 
   return (
     <View style={{flex: 1, backgroundColor: 'white', paddingHorizontal: 20}}>
+      <StatusBar backgroundColor="transparent" barStyle={'dark-content'} />
       <Text
         style={{
           fontSize: 25,

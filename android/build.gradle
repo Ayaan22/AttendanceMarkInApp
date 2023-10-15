@@ -6,15 +6,25 @@ buildscript {
         minSdkVersion = 21
         compileSdkVersion = 33
         targetSdkVersion = 33
-
-        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
         ndkVersion = "23.1.7779620"
     }
+    allprojects{
+    repositories{
+          configurations.all{
+      resolutionStrategy{
+         force "com.google.android.gms:play-services-location:21.0.1"
+  }}
+}
+}
+
+
     repositories {
         google()
         mavenCentral()
     }
+    
     dependencies {
+       
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
     }
